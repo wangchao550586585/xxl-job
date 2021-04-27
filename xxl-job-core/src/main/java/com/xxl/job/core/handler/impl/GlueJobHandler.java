@@ -27,7 +27,7 @@ public class GlueJobHandler extends IJobHandler {
 	}
 
 	@Override
-	public void init() throws Exception {
+	public void init(int jobId) throws Exception {
 		this.jobHandler.init();
 	}
 

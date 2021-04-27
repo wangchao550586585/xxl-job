@@ -21,7 +21,11 @@ public abstract class IJobHandler {
 
 	/**
 	 * init handler, invoked when JobThread init
+	 * @param jobId
 	 */
+	public void init(int jobId) throws Exception {
+		// do something
+	}
 	public void init() throws Exception {
 		// do something
 	}

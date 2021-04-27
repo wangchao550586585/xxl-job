@@ -96,7 +96,7 @@ public class JobThread extends Thread{
     	// init
     	try {
 			//执行初始化任务
-			handler.init();
+			handler.init(jobId);
 		} catch (Throwable e) {
     		logger.error(e.getMessage(), e);
 		}

@@ -26,5 +26,6 @@ public @interface XxlJob {
      * destroy handler, invoked when JobThread destroy
      */
     String destroy() default "";
+    boolean isNeedJobId() default false;
 
 }

@@ -10,6 +10,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Arrays;
@@ -34,7 +35,7 @@ public class SampleXxlJob {
     /**
      * 1、简单任务示例（Bean模式）
      */
-    @XxlJob("demoJobHandler")
+    @XxlJob(value="demoJobHandler",init="init",isNeedJobId = true)
     public void demoJobHandler() throws Exception {
         XxlJobHelper.log("XXL-JOB, Hello World.");
 
@@ -238,16 +239,31 @@ public class SampleXxlJob {
     /**
      * 5、生命周期任务示例：任务初始化与销毁时，支持自定义相关逻辑；
      */
-    @XxlJob(value = "demoJobHandler2", init = "init", destroy = "destroy")
+    @XxlJob(value = "demoJobHandler2", init = "init", destroy = "destroy",isNeedJobId = true)
     public void demoJobHandler2() throws Exception {
         XxlJobHelper.log("XXL-JOB, Hello World.");
     }
-    public void init(){
-        logger.info("init");
+
+    public void init(int jobId){
+        logger.info("init:"+jobId);
     }
+    public void init(){
+        logger.info("init:");
+    }
+
     public void destroy(){
         logger.info("destory");
     }
 
+    public static void main(String[] args) throws Exception {
+//        Class clazz = Class.forName("com.xxl.job.executor.service.jobhandler.SampleXxlJob");
+//        Class clazz =   new SampleXxlJob().getClass();
+//        Class clazz = SampleXxlJob.class.getClass();  这里是直接获取Class类
+        Class clazz = SampleXxlJob.class;
+        Method init = clazz.getDeclaredMethod("init",int.class);
+
+        init.setAccessible(true);
+        init.invoke(new SampleXxlJob() ,111);
+    }
 
 }

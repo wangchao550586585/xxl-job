@@ -13,13 +13,23 @@ public class MethodJobHandler extends IJobHandler {
     private final Method method;    //调度器方法
     private Method initMethod;      //初始方法
     private Method destroyMethod;     //销毁方法
+    private  Boolean isNeedJobId;
 
     public MethodJobHandler(Object target, Method method, Method initMethod, Method destroyMethod) {
+        this.target = target;
+        this.method = method;
+        this.initMethod = initMethod;
+        this.destroyMethod = destroyMethod;
+        this.isNeedJobId=false;
+
+    }
+    public MethodJobHandler(Object target, Method method, Method initMethod, Method destroyMethod, Boolean isNeedJobId) {
         this.target = target;
         this.method = method;
 
         this.initMethod = initMethod;
         this.destroyMethod = destroyMethod;
+        this.isNeedJobId=isNeedJobId;
     }
 
     @Override
@@ -33,9 +43,13 @@ public class MethodJobHandler extends IJobHandler {
     }
 
     @Override
-    public void init() throws Exception {
+    public void init(int jobId) throws Exception {
         if(initMethod != null) {
-            initMethod.invoke(target);
+            if (isNeedJobId){
+                initMethod.invoke(target,jobId);
+            }else{
+                initMethod.invoke(target);
+            }
         }
     }
 

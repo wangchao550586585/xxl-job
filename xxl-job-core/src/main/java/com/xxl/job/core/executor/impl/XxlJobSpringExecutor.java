@@ -139,10 +139,15 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
                 Method destroyMethod = null;
 
                 if (xxlJob.init().trim().length() > 0) {
-                    try {  //获取XxlJob标记的方法,配置的init方法
-                        initMethod = bean.getClass().getDeclaredMethod(xxlJob.init());
+                    try {
+                        if (xxlJob.isNeedJobId()){
+                            //获取XxlJob标记的方法,配置的init方法
+                            initMethod = bean.getClass().getDeclaredMethod(xxlJob.init(),int.class);
+                        }else{
+                            initMethod = bean.getClass().getDeclaredMethod(xxlJob.init());
+                        }
                         initMethod.setAccessible(true);
-                    } catch (NoSuchMethodException e) {
+                    } catch (NoSuchMethodException noSuchMethodException) {
                         throw new RuntimeException("xxl-job method-jobhandler initMethod invalid, for[" + bean.getClass() + "#" + executeMethod.getName() + "] .");
                     }
                 }
@@ -156,7 +161,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
                 }
 
                 // registry jobhandler 将xxljob配置的jobname作为key，对象,反射的执行,初始,销毁方法作为value注册jobHandlerRepository中
-                registJobHandler(name, new MethodJobHandler(bean, executeMethod, initMethod, destroyMethod));
+                registJobHandler(name, new MethodJobHandler(bean, executeMethod, initMethod, destroyMethod,xxlJob.isNeedJobId()));
             }
         }
 
