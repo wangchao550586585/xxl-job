@@ -34,7 +34,8 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
         // init JobHandler Repository
         /*initJobHandlerRepository(applicationContext);*/
 
-        // init JobHandler Repository (for method)   初始化调度器资源管理器
+        // init JobHandler Repository (for method)
+        //初始化调度器资源管理器，从spring容器中将标记了XxlJob注解的方法，将其封装并添加到map中。
         initJobHandlerMethodRepository(applicationContext);
 
         // refresh GlueFactory 刷新GlueFactory
@@ -42,7 +43,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
 
         // super start
         try {
-            //启动
+            //启动服务，接收服务器请求。等
             super.start();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -84,7 +85,8 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
         }
         // init job handler from method
         String[] beanDefinitionNames = applicationContext.getBeanNamesForType(Object.class, false, true);
-        for (String beanDefinitionName : beanDefinitionNames) {//遍历每个容器对象
+        //遍历每个容器对象，将标记XxlJob注解的方法添加到map中。
+        for (String beanDefinitionName : beanDefinitionNames) {
             Object bean = applicationContext.getBean(beanDefinitionName);
 
             Map<Method, XxlJob> annotatedMethods = null;   // referred to ：org.springframework.context.event.EventListenerMethodProcessor.processBean
@@ -103,7 +105,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
             if (annotatedMethods==null || annotatedMethods.isEmpty()) {
                 continue;
             }
-            //遍历标记了XxlJob注解的方法
+            //遍历标记了XxlJob注解的方法，将其封装MethodJobHandler并添加到jobHandlerRepository一个map中。
             for (Map.Entry<Method, XxlJob> methodXxlJobEntry : annotatedMethods.entrySet()) {
                 Method executeMethod = methodXxlJobEntry.getKey();
                 XxlJob xxlJob = methodXxlJobEntry.getValue();

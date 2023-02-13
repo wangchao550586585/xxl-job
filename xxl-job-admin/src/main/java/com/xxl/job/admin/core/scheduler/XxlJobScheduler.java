@@ -97,6 +97,7 @@ public class XxlJobScheduler  {
         // set-cache 找不到就新建
         executorBiz = new ExecutorBizClient(address, XxlJobAdminConfig.getAdminConfig().getAccessToken());
 
+        //添加缓存
         executorBizRepository.put(address, executorBiz);
         return executorBiz;
     }

@@ -42,7 +42,8 @@ public class JobScheduleHelper {
             @Override
             public void run() {
 
-                try {  //保证5秒执行一次
+                try {
+                    //下5秒之后执行一次，等待服务器启动。
                     TimeUnit.MILLISECONDS.sleep(5000 - System.currentTimeMillis()%1000 );
                 } catch (InterruptedException e) {
                     if (!scheduleThreadToStop) {
@@ -100,7 +101,7 @@ public class JobScheduleHelper {
                                         logger.debug(">>>>>>>>>>> xxl-job, schedule push trigger : jobId = " + jobInfo.getId() );
                                     }
 
-                                    // 2、fresh next  更新下次执行时间
+                                    // 2、fresh next  更新下次执行时间，以当前时间为基准。
                                     refreshNextValidTime(jobInfo, new Date());
 
                                 } else if (nowTime > jobInfo.getTriggerNextTime()) {
@@ -111,7 +112,7 @@ public class JobScheduleHelper {
                                     JobTriggerPoolHelper.trigger(jobInfo.getId(), TriggerTypeEnum.CRON, -1, null, null, null);
                                     logger.debug(">>>>>>>>>>> xxl-job, schedule push trigger : jobId = " + jobInfo.getId() );
 
-                                    // 2、fresh next 更新下次执行时间
+                                    // 2、fresh next 更新下次执行时间，以当前时间为基准。
                                     refreshNextValidTime(jobInfo, new Date());
 
                                     // next-trigger-time in 5s, pre-read again 下次触发时间在当前时间往后5秒范围内
@@ -123,7 +124,7 @@ public class JobScheduleHelper {
                                         // 2、push time ring
                                         pushTimeRing(ringSecond, jobInfo.getId());
 
-                                        // 3、fresh next 更新下次执行时间
+                                        // 3、fresh next 更新下次执行时间，以下次执行时间为基准。
                                         refreshNextValidTime(jobInfo, new Date(jobInfo.getTriggerNextTime()));
 
                                     }
@@ -137,7 +138,7 @@ public class JobScheduleHelper {
                                     // 2、push time ring
                                     pushTimeRing(ringSecond, jobInfo.getId());
 
-                                    // 3、fresh next
+                                    // 3、fresh next ，以下次执行时间为基准。
                                     refreshNextValidTime(jobInfo, new Date(jobInfo.getTriggerNextTime()));
 
                                 }
@@ -205,7 +206,7 @@ public class JobScheduleHelper {
                     if (cost < 1000) {  // scan-overtime, not wait
                         try {
                             // pre-read period: success > scan each second; fail > skip this period;
-                            //若执行成功,每秒执行一次，失败则跳过5秒
+                            //若执行成功,下一秒继续执行。执行失败或没查询出数据则5秒执行一次。
                             TimeUnit.MILLISECONDS.sleep((preReadSuc?1000:PRE_READ_MS) - System.currentTimeMillis()%1000);
                         } catch (InterruptedException e) {
                             if (!scheduleThreadToStop) {
@@ -244,8 +245,12 @@ public class JobScheduleHelper {
                     try {
                         // second data
                         List<Integer> ringItemData = new ArrayList<>();
-                        int nowSecond = Calendar.getInstance().get(Calendar.SECOND);   // 避免处理耗时太长，跨过刻度，向前校验一个刻度；
+                        // 避免处理耗时太长，跨过刻度，向前校验一个刻度；
+                        int nowSecond = Calendar.getInstance().get(Calendar.SECOND);
                         for (int i = 0; i < 2; i++) {
+                            //假设现在为1秒，那么执行任务之后，5秒之后的任务分别会添加到23456下标位置。
+                            // i=1：（1+60-1）%60=0
+                            // i=2：（1+60-2）%60=59
                             List<Integer> tmpData = ringData.remove( (nowSecond+60-i)%60 );
                             if (tmpData != null) {
                                 ringItemData.addAll(tmpData);

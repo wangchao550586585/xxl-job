@@ -225,6 +225,7 @@ public class XxlJobTrigger {
         try {
             //获取业务执行器地址,就执行器地址后面拼接token
             ExecutorBiz executorBiz = XxlJobScheduler.getExecutorBiz(address);
+            //通过post请求客户端执行job
             runResult = executorBiz.run(triggerParam);
         } catch (Exception e) {
             logger.error(">>>>>>>>>>> xxl-job trigger error, please check if the executor[{}] is running.", address, e);

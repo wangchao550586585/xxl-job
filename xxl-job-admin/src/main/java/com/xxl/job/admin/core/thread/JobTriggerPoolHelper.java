@@ -105,7 +105,9 @@ public class JobTriggerPoolHelper {
                     // check timeout-count-map  更新成为下一分钟
                     long minTim_now = System.currentTimeMillis()/60000;
                     if (minTim != minTim_now) {
-                        minTim = minTim_now; //当达到下一分钟则清除超时任务
+                    //说明时间执行到下一分钟了
+                        minTim = minTim_now;
+                        //当达到下一分钟则清除超时任务数量统计
                         jobTimeoutCountMap.clear();
                     }
 

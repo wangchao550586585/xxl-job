@@ -65,10 +65,12 @@ public class XxlJobExecutor  {
     public void start() throws Exception {
 
         // init logpath
-        XxlJobFileAppender.initLogPath(logPath);//初始化日志文件
+        //初始化日志文件
+        XxlJobFileAppender.initLogPath(logPath);
 
         // init invoker, admin-client
-        initAdminBizList(adminAddresses, accessToken); //初始化admin链接路径存储集合
+        //封装调度中心请求路径，用于访问调度中心
+        initAdminBizList(adminAddresses, accessToken);
 
 
         // init JobLogFileCleanThread  清除过期日志
